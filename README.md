@@ -1,3 +1,5 @@
+A web application rendering almost 700,000 data points to an interactive map. A mostly useless and not very user-centered web app, I built this project to explore the use of WebGL-powered visualization frameworks for building very large data visualizations. You can view the map at https://ppp-loans-map.web.app.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
