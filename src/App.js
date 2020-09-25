@@ -8,12 +8,19 @@ import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Switch from '@material-ui/core/Switch';
 import { makeStyles } from '@material-ui/core/styles';
+import "firebase/database";
+var firebase = require("firebase/app");
 
-import loanData_a from './complete-loan-data/loans_a.json';
-import loanData_b from './complete-loan-data/loans_b.json';
-import loanData_c from './complete-loan-data/loans_c.json';
-import loanData_d from './complete-loan-data/loans_d.json';
-import loanData_e from './complete-loan-data/loans_e.json';
+// Set the configuration for your app
+const firebaseConfig = {
+  apiKey: process.env.REACT_APP_API_KEY,
+  authDomain: process.env.REACT_APP_AUTH_DOMAIN,
+  databaseURL: process.env.REACT_APP_DATABASE_URL,
+  storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
 
 // Viewport settings
 const INITIAL_VIEW_STATE = {
@@ -70,49 +77,101 @@ function getColor(b) {
 }
 
 export default function App({
-  dataChunks = [loanData_a.features, loanData_b.features, loanData_c.features, loanData_d.features, loanData_e.features],
   radius = 2500,
   mapStyle = 'mapbox://styles/mapbox/dark-v9'
 }) {
+  // @TODO
+  // Create state with UseReducer that tracks ScatterPlotLayers
+  // Only data and visibility is updated when setting new state
+
+  // var layers = [];
   const [hoverInfo, setHoverInfo] = useState({});
+  const [data, setData] = useState([]);
   const [visibility, setVisibility] = useState({
-    a: true,
-    b: true,
-    c: true,
-    d: true,
-    e: true
+    '0': true,
+    '1': true,
+    '2': true,
+    '3': true,
+    '4': true
   });
 
+  useEffect( () => {
+    firebase.database().ref('/a/features').once('value').then(function(snapshot) {
+      setData(prevData => 
+        [...prevData, snapshot.val()]
+      );
+    });
+    firebase.database().ref('/b/features').once('value').then(function(snapshot) {
+      setData(prevData => 
+        [...prevData, snapshot.val()]
+      );
+    });
+    firebase.database().ref('/c/features').once('value').then(function(snapshot) {
+      setData(prevData => 
+        [...prevData, snapshot.val()]
+      );
+    });
+    firebase.database().ref('/d/features').once('value').then(function(snapshot) {
+      setData(prevData => 
+        [...prevData, snapshot.val()]
+      );
+    });
+    firebase.database().ref('/e/features').once('value').then(function(snapshot) {
+      setData(prevData => 
+        [...prevData, snapshot.val()]
+      );
+    });
+  }, []);
+
   const handleChange = (event) => {
+    console.log(visibility[event.target.id]);
     setVisibility({ ...visibility, [event.target.id]: event.target.checked });
   };
 
   const classes = useStyles();
 
-  const layers = dataChunks.map( (dataChunk, index) => {
+  // const layers = data.map( (dataChunk, index) => {
 
-    return new ScatterplotLayer({
-      id: 'chunk-' + index,
-      data: dataChunk,
-      visible: visibility[dataChunk[0].properties.LoanRange.charAt(0)],
+  //   return new ScatterplotLayer({
+  //     id: 'chunk-' + index,
+  //     data: dataChunk,
+  //     visible: visibility[dataChunk[0].properties.LoanRange.charAt(0)],
 
-      // props added by Scatterplot
-      getPosition: d => [d.geometry.coordinates[1], d.geometry.coordinates[0]],
-      getFillColor: d => getColor(d.properties.LoanRange),
-      getRadius: radius,
-      radiusMinPixels: 1,
-      radiusMaxPixels: 4,
-      stroked: true,
-      pickable: true,
-      onClick: info => console.log(dataChunk),
-      onHover: info => setHoverInfo(info)
+  //     // props added by Scatterplot
+  //     getPosition: d => [d.geometry.coordinates[1], d.geometry.coordinates[0]],
+  //     getFillColor: d => getColor(d.properties.LoanRange),
+  //     getRadius: radius,
+  //     radiusMinPixels: 1,
+  //     radiusMaxPixels: 4,
+  //     stroked: true,
+  //     pickable: true,
+  //     onClick: info => console.log(dataChunk),
+  //     onHover: info => setHoverInfo(info)
 
-    });
-  });
+  //   });
+  // });
 
   return (
     <>
-      <DeckGL layers={layers} initialViewState={INITIAL_VIEW_STATE} controller={true}>
+      <DeckGL layers={data.map( (dataChunk, index) => {
+        return new ScatterplotLayer({
+          id: 'chunk-' + index,
+          data: dataChunk,
+          visible: visibility[index],
+
+          // props added by Scatterplot
+          getPosition: d => [d.geometry.coordinates[1], d.geometry.coordinates[0]],
+          getFillColor: d => getColor(d.properties.LoanRange),
+          getRadius: radius,
+          radiusMinPixels: 1,
+          radiusMaxPixels: 4,
+          stroked: true,
+          pickable: true,
+          onClick: info => console.log(dataChunk),
+          onHover: info => setHoverInfo(info)
+          });
+        })}
+      initialViewState={INITIAL_VIEW_STATE} controller={true}>
         <StaticMap
           reuseMaps
           mapStyle={mapStyle}
@@ -135,23 +194,23 @@ export default function App({
         <FormLabel component="legend" className={classes.legend}>Reveal Loan Type</FormLabel>
         <FormGroup>
           <FormControlLabel
-            control={<Switch checked={visibility.a} onChange={handleChange} id="a" />}
+            control={<Switch checked={visibility[0]} onChange={handleChange} id="0" />}
             label="$5-10 million"
           />
           <FormControlLabel
-            control={<Switch checked={visibility.b} onChange={handleChange} id="b" />}
+            control={<Switch checked={visibility[1]} onChange={handleChange} id="1" />}
             label="$2-5 million"
           />
           <FormControlLabel
-            control={<Switch checked={visibility.c} onChange={handleChange} id="c" />}
+            control={<Switch checked={visibility[2]} onChange={handleChange} id="2" />}
             label="$1-2 million"
           />
           <FormControlLabel
-            control={<Switch checked={visibility.d} onChange={handleChange} id="d" />}
+            control={<Switch checked={visibility[3]} onChange={handleChange} id="3" />}
             label="$350,000-1 million"
           />
           <FormControlLabel
-            control={<Switch checked={visibility.e} onChange={handleChange} id="e" />}
+            control={<Switch checked={visibility[4]} onChange={handleChange} id="4" />}
             label="$150,000-350,000"
           />
         </FormGroup>
