@@ -50,7 +50,6 @@ const useStyles = makeStyles({
     borderRadius: 3,
     padding: '20px',
     margin: '10px',
-    // top: '1000px'
   },
   legend: {
     position: 'fixed',
@@ -106,21 +105,21 @@ export default function App({
         [...prevData, snapshot.val()]
       );
     });
-    // firebase.database().ref('/c/features').once('value').then(function(snapshot) {
-    //   setData(prevData => 
-    //     [...prevData, snapshot.val()]
-    //   );
-    // });
-    // firebase.database().ref('/d/features').once('value').then(function(snapshot) {
-    //   setData(prevData => 
-    //     [...prevData, snapshot.val()]
-    //   );
-    // });
-    // firebase.database().ref('/e/features').once('value').then(function(snapshot) {
-    //   setData(prevData => 
-    //     [...prevData, snapshot.val()]
-    //   );
-    // });
+    firebase.database().ref('/c/features').once('value').then(function(snapshot) {
+      setData(prevData => 
+        [...prevData, snapshot.val()]
+      );
+    });
+    firebase.database().ref('/d/features').once('value').then(function(snapshot) {
+      setData(prevData => 
+        [...prevData, snapshot.val()]
+      );
+    });
+    firebase.database().ref('/e/features').once('value').then(function(snapshot) {
+      setData(prevData => 
+        [...prevData, snapshot.val()]
+      );
+    });
   }, []);
 
   const handleChange = (event) => {
@@ -144,7 +143,6 @@ export default function App({
           radiusMaxPixels: 4,
           stroked: true,
           pickable: true,
-          onClick: info => console.log(dataChunk),
           onHover: info => setHoverInfo(info)
           });
         })}
