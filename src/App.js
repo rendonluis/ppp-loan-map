@@ -6,12 +6,13 @@ import FormLabel from '@material-ui/core/FormLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormGroup from '@material-ui/core/FormGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Switch from '@material-ui/core/Switch';
 import { makeStyles } from '@material-ui/core/styles';
 import "firebase/database";
 var firebase = require("firebase/app");
 
-// Set the configuration for your app
+// Set the configuration for firebase
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_API_KEY,
   authDomain: process.env.REACT_APP_AUTH_DOMAIN,
@@ -47,11 +48,14 @@ const useStyles = makeStyles({
     background: 'white',
     border: 0,
     borderRadius: 3,
-    padding: '10px',
-    margin: '10px'
+    padding: '20px',
+    margin: '10px',
+    // top: '1000px'
   },
   legend: {
-    top: '1000px'
+    position: 'fixed',
+    top: '15px',
+    fontSize: '14px'
   },
   tooltip: {
     position: 'absolute',
@@ -80,11 +84,7 @@ export default function App({
   radius = 2500,
   mapStyle = 'mapbox://styles/mapbox/dark-v9'
 }) {
-  // @TODO
-  // Create state with UseReducer that tracks ScatterPlotLayers
-  // Only data and visibility is updated when setting new state
 
-  // var layers = [];
   const [hoverInfo, setHoverInfo] = useState({});
   const [data, setData] = useState([]);
   const [visibility, setVisibility] = useState({
@@ -106,50 +106,28 @@ export default function App({
         [...prevData, snapshot.val()]
       );
     });
-    firebase.database().ref('/c/features').once('value').then(function(snapshot) {
-      setData(prevData => 
-        [...prevData, snapshot.val()]
-      );
-    });
-    firebase.database().ref('/d/features').once('value').then(function(snapshot) {
-      setData(prevData => 
-        [...prevData, snapshot.val()]
-      );
-    });
-    firebase.database().ref('/e/features').once('value').then(function(snapshot) {
-      setData(prevData => 
-        [...prevData, snapshot.val()]
-      );
-    });
+    // firebase.database().ref('/c/features').once('value').then(function(snapshot) {
+    //   setData(prevData => 
+    //     [...prevData, snapshot.val()]
+    //   );
+    // });
+    // firebase.database().ref('/d/features').once('value').then(function(snapshot) {
+    //   setData(prevData => 
+    //     [...prevData, snapshot.val()]
+    //   );
+    // });
+    // firebase.database().ref('/e/features').once('value').then(function(snapshot) {
+    //   setData(prevData => 
+    //     [...prevData, snapshot.val()]
+    //   );
+    // });
   }, []);
 
   const handleChange = (event) => {
-    console.log(visibility[event.target.id]);
     setVisibility({ ...visibility, [event.target.id]: event.target.checked });
   };
 
   const classes = useStyles();
-
-  // const layers = data.map( (dataChunk, index) => {
-
-  //   return new ScatterplotLayer({
-  //     id: 'chunk-' + index,
-  //     data: dataChunk,
-  //     visible: visibility[dataChunk[0].properties.LoanRange.charAt(0)],
-
-  //     // props added by Scatterplot
-  //     getPosition: d => [d.geometry.coordinates[1], d.geometry.coordinates[0]],
-  //     getFillColor: d => getColor(d.properties.LoanRange),
-  //     getRadius: radius,
-  //     radiusMinPixels: 1,
-  //     radiusMaxPixels: 4,
-  //     stroked: true,
-  //     pickable: true,
-  //     onClick: info => console.log(dataChunk),
-  //     onHover: info => setHoverInfo(info)
-
-  //   });
-  // });
 
   return (
     <>
@@ -158,7 +136,6 @@ export default function App({
           id: 'chunk-' + index,
           data: dataChunk,
           visible: visibility[index],
-
           // props added by Scatterplot
           getPosition: d => [d.geometry.coordinates[1], d.geometry.coordinates[0]],
           getFillColor: d => getColor(d.properties.LoanRange),
@@ -214,6 +191,7 @@ export default function App({
             label="$150,000-350,000"
           />
         </FormGroup>
+        <FormHelperText>{data.length !== 5 && 'Loading... ' + (data.length*20).toString() + '%'}</FormHelperText>
       </FormControl>
     </>
   );

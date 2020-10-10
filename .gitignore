@@ -7,7 +7,7 @@
 
 # testing
 /coverage
-/src/complete-loan-data/**
+/src/partial-loan-data/**
 
 # production
 /build
